@@ -55,10 +55,44 @@
 
 ## firebase
 
+mBaaS
+
+- authentication
+- firestore
+- storage
+- hosting
+- functions
+
+本書ではhosting,functionsのみ使用。
+node.js＋expressにてwebAPI作成
+
 ## React
+
+- 略。
 
 ## Angular
 
+- フルスタック
+- typescript
+- RxJS
+
 ## Vue
 
+- 単一ファイルコンポーネント
+
+```js
+  <template>
+  <script>
+  <style>
+```
+- 分けることも可能
+
 ## React Native
+
+- 略
+
+## memo
+
+- slack likeなアプリ作成
+  - react,typescriptでフロントエンド
+  - node.js express firebase でバックエンド
