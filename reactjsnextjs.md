@@ -83,7 +83,7 @@
     - this.setState((state)=>({value}))
       - stateの値を利用して何かするときはこちら。前の値に追加するときなど。。
   - イベントのバインド
-    - <button onClick={this.関数}>
+    - ```<button onClick={this.関数}>```
     - this.関数=this.関数.bind(this);でイベントから関数が実行可能に
     - stateを切り替えて表示内容変更など（count+=1）
       - 参考演算子で場合分けして表示内容変更
@@ -111,5 +111,39 @@
     - const 変数 = React.Context(value);で宣言
     - static aaa=変数;でクラス内で利用
     - Providerでコンテキストを変更
-      - <Context Provider value={}> </Context>の間だけvalueの値を使用する
+      - ```<Context Provider value={}> </Context>```の間だけvalueの値を使用する
       - cssテーマの変更などで利用
+
+## redux
+
+- 値の総合管理。状態管理ツール。
+- 仕組み
+  - ストア　データ（ステート）を補間
+  - ステート　状態
+  - プロバイダー　ストアを他のコンポーネントに受け渡す
+    - コンテキストのProvider
+  - レデューサー　ステートを変更する
+- 使い方
+  - store
+    - varient = createStore(reducer);
+  - reducer
+    - function functionName(state=state,action){}
+      - action.typeでswitchする
+  - provider
+    - ```<Provider store={store}> <App /></Provider>```
+    - 中にあるコンポーネントに内容を渡せる
+  - connect
+    - app=connect(設定内容)(コンポーネント)
+      - 正確にはconnect(mapStateToProps,mapDispatchToProps)(ChildComponent)
+        - mapStateToProps:storeが持っているstateをpropsに入れて子コンポーネントに渡す
+        - mapDispatchToProps:dispatchを呼び出す関数をpropsに入れて子コンポーネントに渡す
+    - [参考１](http://yucatio.hatenablog.com/entry/2018/09/21/225716)
+    - [参考２](https://qiita.com/MegaBlackLabel/items/df868e734d199071b883)
+  - dispatch,action
+    - this.props.dispatch({type:'~~~'});
+      - dispatchはアクションを送る
+    - {type:'~~~'}がアクション部分
+    - reducer、必要な処理が呼び出される
+- 流れ
+  - state陽男,reducer用意,store用意
+  - dispatch呼び出し,reducer呼び出し,actionで分岐
