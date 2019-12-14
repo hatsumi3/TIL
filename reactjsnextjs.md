@@ -209,10 +209,59 @@
   - blacklist,whitelist
     - 保管するデータを整理
     - persistReducerを作る時のconfigで渡す
-    - 停止・再開
+    - 停止・再に変更
       - purge:保存データ削除
       - flush:最新状態を反映
       - pause:保存を一時停止
       - persist:保存処理を再開
       - persisterのメソッドとして呼び出し。
         - persister.flush()　など
+
+## next.js
+
+- クライアントサイドレンダリング
+  - スクリプトを受け取りレンダリング
+  - 検索エンジンに正しく判断してもらえない
+- サーバサイドレンダリング
+  - サーバ側でページを用意しておき配信
+  - Reactはクライアント側で生成するもの
+  - サーバサイドでやるためのライブラリnext.js
+- pages folder
+  - webページを配置しておく場所
+  - next.config.js
+    - トップページの設定
+    - index.jsが読み込まれるようにするなど
+- スタイル
+  - cssは使えない
+  - ビルドインCSS
+    - ```<style jsx>{` css `}</style>```
+    - css部分にcss表記で記述できる
+      - Reactのstyleと混同しないように、、
+      - fontSize: '8pt' , <--> font-size:8pt;
+- 複数ページ
+  - ```<Link href>```
+  - なかのa要素にhrefがなくてもOK
+  - style.js
+    - ビルドインCSSのファイルを分けて書いて読み込む
+  - Layout.js
+    - body要素
+      - header
+      - footer
+    - head要素も埋め込める
+      - ```<Head>```
+- reduxの使用
+  - redux-thunk　ミドルウェア。非同期実行の関数を提供。
+  - redux-store.js
+  - 修正Appコンポーネント
+    - 説明がなかったため略
+    - TODO 別途調べる。
+  - store.js
+    - exportがcreateStore()ではなく、関数のエクスポートに
+    - createStore()の引数にミドルウェアを含める
+- 足し算アプリ
+  - store.jsの中身を変更
+    - 計算部分
+      - 数字意外を取り除いて数値をとりだす。
+        - replace(/[^0-9]/g,"")
+      - 文字列*1で数字として認識させて足し算する。
+    - リセット
