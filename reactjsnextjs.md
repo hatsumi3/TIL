@@ -145,5 +145,74 @@
     - {type:'~~~'}がアクション部分
     - reducer、必要な処理が呼び出される
 - 流れ
-  - state陽男,reducer用意,store用意
+  - state用意,reducer用意,store用意
   - dispatch呼び出し,reducer呼び出し,actionで分岐
+- memoアプリを作る
+  - Store.js
+    - reducer
+      - switch文でreducerActionを呼び出し
+    - reducerAction
+      - add,delete.findで行う処理を書く
+      - 文字操作関連メモ
+        - unshift:配列の先頭に追加
+        - indexOf:indexとりだし
+        - splice:indexから文字数分削除する
+        - slice:配列をつくる
+          - setStateで元の配列を渡しても更新が行われない。
+        - 参考[http://www.htmq.com/js/array_splice.shtml](http://www.htmq.com/js/array_splice.shtml)
+    - ActionCreater
+      - dispatchで渡す
+      - reducerがswitch判定してreducerAction
+  - Form.js
+    - form onSubmit=this.doAction
+      - actioncreater作ってdispatch
+- redux persist
+  - 永続化。上記実装だとブラウザ更新で中身が消える。
+  - ローカルストレージで管理する
+  - persistReducer
+    - const varient - persistreducer(config,reducer);
+  - persister
+    - store = createStore(persistRreducer)
+    - varient = persistStore(store)
+  - PersistGate
+    - ```<PersistGate persister={persister}/>```
+    - コンポーネントの表示を待たせるもの
+  - sample
+
+    ```js
+    const persistConfig = {
+    key: 'memo',
+    storage:storage,
+    blacklist: ['message','mode','fdata'],
+    whitelist: ['data']
+    };
+
+    const persistedReducer = persistReducer(persistConfig,memoReducer);
+
+    let store = createStore(persistedReducer);
+    let pstore = persistStore(store);
+
+    ReactDOM.render(
+        <Provider store={store}>
+            <PersistGate loading={<p>loading...</p>} persistor={pstore}>
+                <App />
+            </PersistGate>
+        </Provider>,
+        document.getElementById('root')
+    );
+    ```
+  
+  - storageの中身を確認
+    - chrome developer tools -> application -> local storage
+    - ストレージにはオブジェクトは保存できないときがある
+      - メモアプリだと new Date()　など。
+  - blacklist,whitelist
+    - 保管するデータを整理
+    - persistReducerを作る時のconfigで渡す
+    - 停止・再開
+      - purge:保存データ削除
+      - flush:最新状態を反映
+      - pause:保存を一時停止
+      - persist:保存処理を再開
+      - persisterのメソッドとして呼び出し。
+        - persister.flush()　など
