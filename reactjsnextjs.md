@@ -265,3 +265,39 @@
         - replace(/[^0-9]/g,"")
       - 文字列*1で数字として認識させて足し算する。
     - リセット
+
+## firebaseの利用
+
+- webアプリにfirebaseを追加
+  - Authentication 右下のマークからjavascriptをコピー可能
+  - let db = firebase.database();
+    - オブジェクト取り出し
+  - let ref = db.ref('sample/');
+    - オブジェクトの参照
+  - ref.orderByKey()
+    - データの取り出し
+    - メソッドチェーンを使う
+  - onイベント処理
+    - 非同期処理で実行
+    - 検索終わり次第・・など
+- ページの移動
+  - Router.push('./page');
+    - アプリケーション内のページ移動
+    - 外部へは不可
+- ユーザ認証関連
+  - var varient = new firebase.auth.GoogleAuthProvider();
+    - firebaseのAuthenticationの許可を通しておく
+    - キーのエンコード
+      - 使えない文字がある . # $ [ ]
+    - deepcopy
+      - 要素の中までコピー
+
+## 所感
+
+- Stateで持つ情報の設計が大切。
+  - 全画面に影響する。
+- cssは結局要素ごとに記載すべき？
+  - サイト構造によりそうだけど一般的には？
+- webpack,serviceworkerなどは記載なし。
+- webstorage,sessionなどが気になる。
+  - バックエンド側もfirebaseではなく学んでおく。
