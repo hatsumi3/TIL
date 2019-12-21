@@ -167,3 +167,190 @@ function showDicePage (req, res) {
   - requireで呼ぶ
   - import/export
     - node.jsならbabelで変換して利用できる
+
+## React
+
+### 基本
+
+- htmlからscriptを読み込めば使える
+  - react,babel
+  - 要素を指定してscriptで描画。
+
+  ```js
+  <div id="root"></div>
+    <!-- スクリプトの定義 ───(※3) -->
+    <script type="text/babel">
+      ReactDOM.render(
+        <h1>Hello, world!</h1>,
+        document.getElementById('root')
+      )
+    </script>
+  ```
+
+### jsx
+
+- {value}で埋め込み
+- 閉じタグが必要
+- 括弧でくくる必要がある箇所あり。
+- 複数DOMは返せない。
+- style
+  - cssはオブジェクトにあてる
+  - ケバブケースではなく、キャメルケース（css通りではない）
+- 変数の値はエスケープされる
+  - XSSを防げる
+
+### virtualDOM
+
+- 仮想DOM
+  - DOMの状態をメモリ上に保存しておいて、更新前と更新後の状態を比較して、必要最小限の部分だけを更新するという機能
+  - 差分だけ更新される。画面の更新が速い。
+- サンプル
+
+```js
+  <script type="text/babel">
+  // 定期的に時間を表示
+  setInterval(showClock, 1000)
+  // 毎秒実行される関数
+  function showClock () {
+      const d = new Date()
+      const [hour, min, sec] = [ // 時分秒を各変数に代入 --- (※1)
+        d.getHours(),
+        d.getMinutes(),
+        d.getSeconds()]
+      const z2 = (v) => { // 0で埋めて表示する関数を定義 --- (※2)
+        const s = "00" + v
+        return s.substr(s.length - 2, 2)
+      }
+      // 表示するDOMを指定 --- (※3)
+      const elem = (<div>
+        {z2(hour)}:{z2(min)}:{z2(sec)}
+      </div>);
+      // DOMを書き換える
+      ReactDOM.render(elem,
+        document.getElementById("root"))
+    }
+  </script>
+```
+
+- substr(arg1,arg2)
+  - arg1:開始位置
+  - arg2:文字数
+  - 上の例だと後ろの2文字をとるため、先頭に0を付与できる
+
+### コンポーネント
+
+- 部品。組み合わせる、再利用する。
+- サンプル
+
+```js
+function Greeting(props) {
+  return <h1>{props.type}</h1>
+}
+
+// Greetingコンポーネントを利用する
+const dom = <div>
+  <Greeting type="Good morning!" />
+  <Greeting type="Hello!" />
+  <Greeting type="Good afternoon!" />
+</div>
+
+```
+
+- classでもComponentを定義できる
+
+```js
+    class CBox extends React.Component {
+      // コンストラクタ --- (※2)
+      constructor (props) {
+        super(props)
+        // 状態の初期化
+        this.state = {checked: false}
+      }
+      render () {
+        // 未チェックの状態 --- (※3)
+        let mark = '□'
+        let bstyle = { fontWeight: 'normal' }
+        // チェックされているか --- (※4)
+        if (this.state.checked) {
+          mark = '■'
+          bstyle = { fontWeight: 'bold' }
+        }
+        // クリックした時のイベントを指定 --- (※5)
+        const clickHandler = (e) => {
+          const newValue = !this.state.checked
+          this.setState({checked: newValue})
+        }
+        // 描画内容を返す --- (※6)
+        return (
+          <div onClick={clickHandler} style={bstyle}>
+            {mark} {this.props.label}
+          </div>
+        )
+      }
+    }
+    // ReactでDOMを書き換える --- (※7)
+    const dom = <div>
+      <CBox label="Apple" />
+      <CBox label="Banana" />
+      <CBox label="Orange" />
+      <CBox label="Mango" />
+    </div>
+    ReactDOM.render(dom,
+      document.getElementById('root'))
+  </script>
+
+
+```
+
+- アロー関数でも定義できる
+- stateの利用
+  - コンポーネントの状態管理
+  - setStateで状態を更新する
+    - その後renderが呼び出される
+- 要素のイベント
+  - button等、onClick onChangeなどキャメルケースの既存イベントが用意されている。
+
+### 自動ビルド、webpack
+
+- create-react-appで開発環境を生成できる、
+  - npm run build
+    - ビルド
+  - serve -s build -p 3000
+    - サーバー公開
+- webpack
+  - リソースファイルの最適化
+  - 変換して１つのjavascriptに。
+  - webpack main.js out/test.js
+  - 変換指示書　webpack.config.js
+    - webpackの実行で変換できる
+    - --configをつけて設定ファイルを指定
+    - -p　最適化してビルド
+    - -watch　監視モードで差分ビルド
+    - 設定ファイル内容
+      - test　ファイルパターン
+      - loader　どのプラグインを使うか
+      - options　プラグインのオプション
+      - サンプル
+
+        ```js
+          module.exports = {
+            entry: './src/main.js',
+            output: {
+              filename: './out/bundle.js'
+            },
+            module: {
+              rules: [
+                {
+                  test: /.js$/,
+                  loader: 'babel-loader',
+                  options: {
+                    presets:['es2015', 'react']
+                  }
+                }
+              ]
+            }
+          };
+        ```
+
+- npm init force
+  - すでにインストールされているパッケージも含めて、全ての依存パッケージをインストール
