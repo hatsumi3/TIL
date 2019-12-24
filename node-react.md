@@ -3,7 +3,7 @@
 本：いまどきのjsプログラマーのための node.jsとreactアプリケーション開発テクニック
 URL:[https://www.socym.co.jp/book/1114](https://www.socym.co.jp/book/1114)
 
-## ch1
+## ch1 node.js
 
 ### javascript history
 
@@ -168,7 +168,7 @@ function showDicePage (req, res) {
   - import/export
     - node.jsならbabelで変換して利用できる
 
-## React
+## ch2 React
 
 ### 基本
 
@@ -354,3 +354,120 @@ const dom = <div>
 
 - npm init force
   - すでにインストールされているパッケージも含めて、全ての依存パッケージをインストール
+
+## ch3 React Component
+
+### ライフサイクル
+
+- ライフサイクルメソッド
+  - constructor:オブジェクト生成
+  - componentWillMount:マウントの直前
+  - render:描画
+  - componentDidMount:マウント直後
+  - 利用
+    - componentWillRecieveProps:プロパティが変更されたとき
+    - shouldComponentUpdate:コンポーネント外観を変えていいか判断する
+      - 返すのはtrue/false
+    - componentWillUpdate:更新直前
+    - render:描画
+    - componentDidUpdate:更新直後
+  - componentWillUnmount:削除時
+
+### 入力フォーム
+
+- バインドの方法
+  - (e)=>this.doSubmit(e)　たびたび関数が作られる。
+  - this.doSubmit().bind(this) こちら推奨のはず。
+- 数値のみの入力
+  - 正規表現で縛る
+  - ```replace(/[^0-9]/g,'')``` など
+  - ```this.setState({[key]:value})```
+    - ```[key]```も変数
+
+### コンポーネント間やりとり
+
+- propsを利用
+  - 親、子コンポーネント連携
+- 3大要素
+  - state
+    - 状況に応じて変化
+    - 書き換え可能
+    - 状態変更で再描画
+    - 外部非公開、コンポーネント地震で管理
+  - props
+    - 読み取り専用
+    - 親要素から設定される
+    - 初期値、型検証可能
+      - propTypes,defaultProp,interface
+  - イベント
+    - イベント名が異なる、キャメルケース
+    - バインドが必要
+
+### フィルタバリデーション
+
+- 正規表現
+  - 参考[https://userweb.mnet.ne.jp/nakama/](https://userweb.mnet.ne.jp/nakama/)
+  - regexp.test(string)で判定。　regular expression
+
+###　DOM直接アクセス
+
+- 基本は直接行わない
+  - 例外もある。フォーカスさせたいときなど
+  - refの使用
+
+    ```js
+    <input 
+      type='text'
+      ref={(obj) => {this.textUser = pbj}}
+    />
+    ```
+
+    - objectを手に入れる
+    - this.textUser.focus()など
+  - render()中ではオブジェクトを参照できない
+    - あくまでも仮想DOMを作るものであるため。本体ではない。
+
+### Ajax asyncronous javascript xml
+
+- jquery DOM操作＋Ajax
+- superAgent Ajax
+  - メソッドチェーンで受け取り時の処理を記述
+
+  ```js
+  // 機能を取り込み --- (※1)
+  const request = require('superagent')
+
+  // 指定のURLからデータを取得する --- (※2)
+  const URL = 'http://localhost:3000/fruits.json'
+  request.get(URL)
+        .end(callbackGet)
+
+  // データを取得した時の処理 --- (※3)
+  function callbackGet (err, res) {
+    if (err) {
+      // 取得できなかった時の処理
+      return
+    }
+    // ここで取得したときの処理
+    console.log(res.body)
+  }
+
+  ```
+
+  - resはオブジェクト、ヘッダなどの情報を含む
+  - その他機能
+    - query:URLパラメータ
+    - set:認証情報など
+    - post:postしたいとき。getのときはget
+    - send:postのときのパラメータ指定
+  - コンポーネントの読み込みはcomponentWillMountに記述
+
+### フォーム部品の使い方
+
+- input type='text'
+- input type='checkbox'
+- textarea
+- input type='radio'
+- select
+
+## ch4
