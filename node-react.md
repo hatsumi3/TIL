@@ -470,4 +470,124 @@ const dom = <div>
 - input type='radio'
 - select
 
-## ch4
+## ch4 electron reactnative
+
+- electron
+  - PC向けクロスプラットフォーム対応のデスクトップアプリエンジン
+  - Chromiumエンジン
+  - アプリのサイズが大きくなる
+- React Native
+  - スマホ向け
+
+### Electron 仕組み
+
+- メインプロセスからレンダラープロセスを呼び出す
+  - IPC通信(interprocess communication)
+  - 利用できるAPIが異なる
+  - API一覧
+    - ダイアログなど
+    - [https://electronjs.org/docs/api](https://electronjs.org/docs/api)
+  - 配布
+    - asar
+      - プロジェクトをアーカイブ化
+    - electron^packager
+      - exeファイル生成
+
+## ch5 SPA framework
+
+- SPA simgle page application
+  - 従来：リンクをクリック度にwebサーバにアクセス
+  - SPA:必要な時だけアクセス
+    - 初回の読み込みに時間がかかる
+    - 昔はSEOに弱かった(SSR)
+
+### web framework
+
+- express node.js メジャー
+  - 他にもkoa meteorなど
+- get post
+  - sample
+
+  ```js
+  
+    // Expressを起動
+  const express = require('express')
+  const app = express()
+  // body-parserを有効にする
+  const bodyParser = require('body-parser')
+  app.use(bodyParser.urlencoded({extended: true}))
+
+  app.listen(3000, () => {
+    console.log('起動しました - http://localhost:3000')
+  })
+  // GETメソッドならWebフォームを表示
+  app.get('/', (req, res) => {
+    res.send('<form method="POST">' +
+      '<textarea name="memo">テスト</textarea>' +
+      '<br /><input type="submit" value="送信">' +
+      '</form>')
+  })
+  // POSTメソッドを受け付ける
+  app.post('/', (req, res) => {
+    const s = JSON.stringify(req.body)
+    res.send('POSTを受信: ' + s)
+  })
+
+  ```
+
+  - memo
+    - get
+      - path /
+      - (req,res) =>{}
+        - res.sendで返す
+    - post
+      - path /
+      - (req,res) =>{}
+      - 表示にはbody-parser必要
+  - ファイルの受け取り
+    - multerライブラリ
+    - アップロードのファイルのセキュリティ
+      - MIME
+      - バイナリレベル
+
+### flux
+
+- flux
+  - action：命令
+  - dispatcher：命令を伝達
+  - store:状態を記録
+  - view：状態に応じて描画
+- 実装
+  - action
+    - ActionTypeを準備
+    - dispatcherになげるメソッドを定義
+  - dispatcher
+    - Dispatcherメソッドで宣言するのみ
+  - store
+    - コールバック関数の定義
+    - ActionTypeに応じた処理分け
+  - view
+    - viewの動作からはactionを投げる
+
+### React Router
+
+- react-router-dom
+  - react-router-nativeはReactNative向け
+  - ```<Router>```
+    - 親要素。
+  - ```<Route　path='' component={}>```
+    - どのパスでどれをよびだすか
+  - ```<Route　component={}>```
+    - ```<Switch>```が親要素だとdefaultを設定できる。pathを設定しない。
+- チャットアプリ
+  - nedb
+    - json　likeでデータ保存
+  - サーバサイドでクライアントサイド側へルーティング
+  - superagent get()でデータ取得
+  - リアルタイム性
+    - websocket socket.io
+    - ajaxのcomet ロングポーリングを回避
+      - 通常Non Blocking I/Oを持つサーバを使用 node.jsなど
+    - http serverをlisten関数で渡す
+
+## ch6
