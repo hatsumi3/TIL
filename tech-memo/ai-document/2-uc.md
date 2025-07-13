@@ -142,7 +142,7 @@ erDiagram
 ```json
 {
   "email": "user@example.com",
-  "opt_status": "Opted-in",
+  "opt_status": "'Opted-in'",
   "updated_at": "2025-07-14T10:00:00Z"
 }
 ```
@@ -178,12 +178,12 @@ erDiagram
   "results": [
     {
       "email": "user@example.com",
-      "opt_status": "Opted-in",
+      "opt_status": "'Opted-in'",
       "updated_at": "2025-07-14T10:00:00Z"
     },
     {
       "email": "user2@example.com",
-      "opt_status": "Opted-out",
+      "opt_status": "'Opted-out'",
       "updated_at": "2025-07-12T15:30:00Z"
     }
   ]
