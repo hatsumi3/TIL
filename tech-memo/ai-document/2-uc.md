@@ -1,0 +1,199 @@
+
+# 広告メール許諾管理システム 基本設計書
+
+| 項目 | 内容 |
+| :---|:---|
+| ドキュメントバージョン | 1.0 |
+| 作成日 | 2025/07/14 |
+| 作成者 | Gemini |
+| 関連ドキュメント | 広告メール許諾管理システム 要件定義書 Ver.1.0 |
+
+-----
+
+## 1\. はじめに
+
+本ドキュメントは、「広告メール許諾管理システム 要件定義書」に基づき、システムの実現に必要な基本設計を定義するものです。
+
+-----
+
+## 2\. システム構成図
+
+本システムは、ユーザー向けWebフロントエンド、バックエンドAPI、データベースで構成されます。外部のメール配信システムとはAPI経由で連携します。
+
+```mermaid
+graph TD
+  A[ユーザー] --> B[Webブラウザ]
+  B --> C["Webサーバー (フロントエンド)"]
+  C -- HTTPS/API Call --> D["APサーバー (バックエンド API)"]
+  D --> E["データベース (PostgreSQL)"]
+  D -- API Call --> F[外部メール配信システム]
+```
+
+-----
+
+## 3\. データベース設計 (Database Design)
+
+### 3.1. ER図 (Entity-Relationship Diagram)
+
+本システムで利用するテーブルは以下の通りです。
+
+```mermaid
+erDiagram
+    users_opt_status {
+        SERIAL id PK
+        VARCHAR(255) email "NOT NULL, UNIQUE"
+        VARCHAR(10) opt_status "NOT NULL"
+        TIMESTAMP created_at "NOT NULL"
+        TIMESTAMP updated_at "NOT NULL"
+    }
+```
+
+### 3.2. テーブル定義
+
+**テーブル名: users\_opt\_status**
+
+ユーザーのメールアドレスと広告メールの許諾ステータスを管理します。
+
+| カラム名 | データ型 | 制約 | 説明 |
+|---|---|---|---|
+| id | SERIAL | PRIMARY KEY | 一意なサロゲートキー |
+| email | VARCHAR(255) | NOT NULL, UNIQUE | ユーザーのメールアドレス |
+| opt\_status | VARCHAR(10) | NOT NULL | 許諾ステータス。'Opted-in' または 'Opted-out' のいずれかの文字列を格納。 |
+| created\_at | TIMESTAMP | NOT NULL | レコード作成日時 |
+| updated\_at | TIMESTAMP | NOT NULL | レコード最終更新日時 |
+
+-----
+
+## 4\. API設計 (API Design)
+
+フロントエンドとバックエンド、および外部システムとの連携は以下のAPI仕様に準拠します。
+
+### API-01: 許諾ステータス更新API
+
+| 項目 | 内容 |
+|---|---|
+| API名 | 許諾ステータス更新API |
+| 機能概要 | ユーザーのオプトイン・オプトアウトを受け付け、ステータスを更新する。 |
+| エンドポイント | `/api/v1/opt-status` |
+| HTTPメソッド | POST |
+
+**リクエストボディ (Request Body)**
+
+```json
+{
+  "email": "user@example.com",
+  "action": "opt_in"
+}
+```
+
+`action` は `"opt_in"` または `"opt_out"` のいずれかです。
+
+**レスポンス (Response)**
+
+**成功時 (200 OK)**
+
+```json
+{
+  "status": "success",
+  "message": "Opt-in successful."
+}
+```
+
+**バリデーションエラー時 (400 Bad Request)**
+
+```json
+{
+  "status": "error",
+  "message": "Invalid email format."
+}
+```
+
+**対象データなし (404 Not Found) ※オプトアウト時のみ**
+
+```json
+{
+  "status": "error",
+  "message": "Email not found."
+}
+```
+
+### API-02: 許諾ステータス取得API (管理者・外部連携用)
+
+| 項目 | 内容 |
+|---|---|
+| API名 | 許諾ステータス取得API |
+| 機能概要 | 指定されたメールアドレスの許諾ステータスを取得する。 |
+| エンドポイント | `/api/v1/admin/status` |
+| HTTPメソッド | GET |
+
+**リクエストクエリパラメータ (Request Query Parameter)**
+
+`email`: `user@example.com` (必須)
+
+**レスポンス (Response)**
+
+**成功時 (200 OK)**
+
+```json
+{
+  "email": "user@example.com",
+  "opt_status": "Opted-in",
+  "updated_at": "2025-07-14T10:00:00Z"
+}
+```
+
+**対象データなし (404 Not Found)**
+
+```json
+{
+  "status": "error",
+  "message": "Email not found."
+}
+```
+
+-----
+
+## 5\. 画面設計 (Screen Design)
+
+### 5.1. 画面一覧
+
+| 画面ID | 画面名 | URLパス |
+|---|---|---|
+| SCR-01 | ユーザー向け手続き画面 | `/` |
+| SCR-02 | 管理者向け検索画面 | `/admin` |
+
+### 5.2. 画面遷移図
+
+```mermaid
+graph TD
+    A[インターネット] --> B[SCR-01: ユーザー向け手続き画面]
+    B -- 手続き実行 --> C["SCR-01 (完了メッセージ表示)"]
+    A --> D[SCR-02: 管理者向け検索画面]
+    D -- 検索実行 --> E["SCR-02 (結果表示)"]
+```
+
+### 5.3. 各画面の詳細設計
+
+**画面ID: SCR-01 ユーザー向け手続き画面**
+
+**概要**: ユーザーがオプトイン・オプトアウトを行うための単一ページです。
+
+**レイアウト**:
+
+| 要素名 | 種別 | 説明 |
+| :--- | :--- | :--- |
+| メールアドレス入力欄 | テキスト入力 | ユーザーのメールアドレスを入力する。 |
+| プライバシーポリシー同意 | チェックボックス | オプトイン時に表示。同意が必須。 |
+| 配信を希望するボタン | ボタン | API-01 (`action`: `"opt_in"`) を呼び出す。 |
+| 配信を停止するボタン | ボタン | API-01 (`action`: `"opt_out"`) を呼び出す。 |
+| メッセージ表示エリア | テキスト表示 | 処理結果（完了、エラー）を表示する。 |
+
+**処理フロー**:
+
+1.  ユーザーがメールアドレスを入力します。
+2.  **配信を希望するボタン**をクリックした場合:
+    a.  プライバシーポリシー同意チェックボックスがONになっているか検証します。
+    b.  API-01を`action`: `"opt_in"`で呼び出します。
+3.  **配信を停止するボタン**をクリックした場合:
+    a.  API-01を`action`: `"opt_out"`で呼び出します。
+4.  APIからのレスポンスに応じて、メッセージ表示エリアに結果を表示します。
