@@ -25,9 +25,12 @@
 | | Hono | ^4.8.5 |
 | | TypeScript | ^5.8.3 |
 | | node-postgres (pg) | ^8.16.3 |
+| | nodemailer | ^6.9.14 |
 | **フロントエンド** | SvelteKit | ^2.22.0 |
 | | Vite | ^7.0.4 |
 | **データベース** | PostgreSQL | 15 (Docker Image) |
+| **テスト** | Vitest | ^2.0.4 |
+| | Hono (testing) | Hono本体に同梱 |
 | **開発環境** | Docker Compose | - |
 | **コード品質** | ESLint, Prettier | - |
 
@@ -110,6 +113,7 @@ EXECUTE FUNCTION update_updated_at_column();
     5. データベース処理でエラーが発生した場合は、ステータスコード `500` を返す。
     6. 処理完了後、データベース接続をプールに返却する。
     7. 成功時は、処理内容に応じたメッセージをJSON形式で返す。
+    8. 処理完了後、`nodemailer` を利用してユーザーに完了通知メールを送信する。
 
 -----
 
@@ -150,7 +154,16 @@ npm install
 npm run dev # http://localhost:5173 で起動
 ```
 
-### 6.5. コード整形と静的解析
+### 6.5. テストの実行
+
+```bash
+# project/api ディレクトリで実行
+npm run test:run # テストを1回実行
+
+npm test # 変更を監視してテストを自動実行
+```
+
+### 6.6. コード整形と静的解析
 
 ```bash
 # project/web ディレクトリで実行
