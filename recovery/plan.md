@@ -7,7 +7,7 @@ date: 2026-09-28
 ## 目標
 
 - 資格取得 AI関連
-  - AI Business
+  - AI Business 済
   - AI Professional
 - 健康的な生活
 - 仕事のスタンス整理
